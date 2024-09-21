@@ -1,0 +1,49 @@
+<template>
+  <div>
+    <b-alert variant="danger" v-model="showFailure" dismissible>
+      Error deleting student! Try again later.
+    </b-alert>
+    <b-form @submit="onSubmit">
+      <b-alert variant="danger" show
+        >Are you sure you want to delete all
+        <span class="font-weight-bolder">
+          {{ studentCount }}
+        </span>
+        students?</b-alert
+      >
+      <div></div>
+
+      <b-button type="submit" variant="danger" :disabled="disableSubmit">
+        Delete
+      </b-button>
+    </b-form>
+  </div>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import students from '../../../api/students';
+
+@Component({})
+export default class DeleteAllStudentsForm extends Vue {
+  @Prop(Number) studentCount!: number;
+
+  showFailure = false;
+  disableSubmit = false;
+
+  onSubmit(evt: Event) {
+    evt.preventDefault();
+    this.showFailure = false;
+    this.disableSubmit = true;
+
+    students.deleteAllStudents().then((data) => {
+      if (data.success) {
+        this.$emit('delete-success');
+      } else {
+        this.showFailure = true;
+      }
+      this.disableSubmit = false;
+    });
+  }
+}
+</script>
